@@ -1,6 +1,6 @@
-//This program reads output text files from WinRhizo files and
-//extracts from them the information concerning root segments (links)
-//and writes it to one file kaikki.dat. The input files are given in
+//This program reads output text files of  WinRhizo  and
+//extracts from them the informations concerning root segments (links)
+//and writes them to the file kaikki.dat. The input files are given in
 //file files.txt.
 
 //The WinRhizo text files are Windows files and need to be transformed
@@ -11,7 +11,7 @@
 
 //The outline of program is simple: 1) read a line from
 //WinRhizo_file, replace some characters in it, 2) Extract data, if
-//line concerns a LINK , and write to kaikki.dat
+//line concerns a LINK, and write to kaikki.dat
 
 //This program compiles with g++ extract_linkinformation.cc -o extract
 
