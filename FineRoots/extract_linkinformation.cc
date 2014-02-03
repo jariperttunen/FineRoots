@@ -6,12 +6,21 @@
 //The WinRhizo text files are Windows files and need to be transformed
 //to Unix (otherwise this program does not recognize end of a
 //line). This succeeded (on Risto's Mac OS X 10.9.1) with Perl script
-//perl -pe 's/\r\n|\n|\r/\n/g' WinRhizo_file |cut -f 1-20 | tr ' ' _ >
-//output_file
+//perl -pe 's/\r\n|\n|\r/\n/g' Winrhizo_file |cut -f 1-20 | tr ' ' _ >
+//Output_file
 
-//The outline of program is simple: 1) read a line from
+//This program consists of two parts:
+//First: 1) read a line from
 //WinRhizo_file, replace some characters in it, 2) Extract data, if
-//line concerns a LINK, and write to kaikki.dat
+//line concerns a LINK, and write to kaikki0.dat
+
+//2) Second read information of one root from kaikki0.dat (defined by SampleId and Part,
+//they are in the two first columns of kaikki0.dat), calculate root
+//volume (mm3) as PI x (diam/2) x length (diam is transformed 1/10 mm
+// to mm) and write the data to file kaikki.dat (otherwise the same
+// as kaikki0.dat but also with root volume)
+
+//3) Delete file kaikki0.dat
 
 //This program compiles with g++ extract_linkinformation.cc -o extract
 
@@ -22,7 +31,8 @@
 #include <iomanip>
 #include <sstream>
 #include <list>
-#include<vector>
+#include <vector>
+#include <math.h>
 
 using namespace std;
 
@@ -55,12 +65,41 @@ void replace_umlaut(string& str) {
 //     if(int(str[i]) == 153) str[i] = 'O';   
   }
 }
-    
 
+void  output_previous_root (list<vector<string> >& r_links, ofstream& f_stream) {
+  const double PI = 3.141593;
+
+  list<vector<string> >::iterator rI;
+  double root_volume = 0.0;
+  for(rI = r_links.begin(); rI != r_links.end(); rI++) {
+    double len = atof(((*rI)[4]).c_str());      //pituus on rivin 5's elementti 
+    double d = atof(((*rI)[7]).c_str());        //lpm on rivin 8's elementti
+    d /= 10.0;                                  //jonka laatu on 1/10 mm
+    root_volume += PI*pow(d/2.0,2.0)*len;
+    ostringstream oss;
+    oss << setprecision(3) << d;
+    (*rI)[7] = oss.str();             //nyt lpm on samaa laatua (mm) kun pituus
+  }
+
+  ostringstream oss;
+  oss << setprecision(4) << root_volume;
+  string root_volume_string = oss.str();
+
+  for(rI = r_links.begin(); rI != r_links.end(); rI++) {
+    for(int i = 0; i < 13; i++) {
+      f_stream << (*rI)[i] << " ";
+    }	 
+    f_stream << 	 root_volume_string << " ";
+
+    for(int i = 13; i < 19; i++) {
+      f_stream << (*rI)[i] << " ";
+    }
+    f_stream << endl;
+  }
+}
 
 int main(int argc, char** argv)
 {
-
   //Ensiksi luettavat tiedostot tiedostosta
   ifstream file_file("files.txt");
   if (!file_file) {
@@ -81,9 +120,8 @@ int main(int argc, char** argv)
 
   //Sitten prosessoidaan tiedostot
 
-  ofstream sum_file("kaikki.dat",ofstream::trunc);
-  sum_file << "SampleId Part LinkNo SeedlingNo Length ProjArea SurfArea AvgDiam Ind Angle" <<
-    " Magnitude Altitude Order Father Brother1 Brother2 Baby1 Baby2 Baby3" << endl;
+  ofstream sum_file("kaikki0.dat",ofstream::trunc); //Tama on valikaikainen
+  //tulostustiedosto
 
   list<string>::iterator I;
   for(I = input_files.begin(); I != input_files.end(); I++) {
@@ -146,12 +184,63 @@ int main(int argc, char** argv)
 	  sum_file << fields[i] << " ";
 	}
 	sum_file << endl;
-      }
+      }    // if(s2 == "LINK" && s1 != "SampleId") ...
 
     }
     data_file.close();
   }
   sum_file.close();
+
+
+  //Part 2: read kaikki0.dat and add root volume
+
+  ofstream  lopullinen("kaikki.dat", ofstream::trunc);
+  lopullinen << "SampleId Part LinkNo SeedlingNo Length ProjArea SurfArea AvgDiam Ind Angle" <<
+    " Magnitude Altitude Order RVolume Father Brother1 Brother2 Baby1 Baby2 Baby3" << endl;
+
+  list<vector<string> > root_links;
+  ifstream  uudestaan("kaikki0.dat");
+
+  string current_label2 = "", current_label1 = "";
+  vector<string> items(19);
+  for(;;) {
+    getline(uudestaan,line);
+    if(uudestaan.eof())
+      break;
+    if(line[0] == '#') {
+      continue;
+    }
+
+    istringstream l(line);
+    for(int i = 0; i < 19; i++) {
+      l >> items[i];
+    }
+
+    if(items[1] != current_label2 || items[0] != current_label1) {
+      current_label2 = items[1];
+      current_label1 = items[0];
+    
+      output_previous_root(root_links, lopullinen);
+      root_links.clear();
+    }
+
+    root_links.push_back(items);
+  }
+
+  //tämä koska muuten viimeinen juuri jaa kasitteöematta, kun
+  //on tultu for(;;) loopista pois break : lla
+  output_previous_root(root_links, lopullinen);
+
+  lopullinen.close();
+
+  // 3)
+  if(remove ("kaikki0.dat") != 0) {
+    cout << "kaikki0.dat tiedoston poisto epaonnistui!" << endl;
+  }
+  else {
+    cout << "Valitulostiedosto kaikki0.dat poistettu" << endl;
+  }
+
   exit(0);
 }
 
