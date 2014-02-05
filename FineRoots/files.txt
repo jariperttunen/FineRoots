@@ -1,4 +1,4 @@
-/Users/matrps/Riston-D/E/Hankkeet/LIGNUM/Erillishankkeet/Hienot-juuret/juuristoskannaukset/Keltainen_1ABC.TXT
+/Users/matrps/Riston-D/E/Hankkeet/LIGNUM/Erillishankkeet/Hienot-juuret/juuristoskannaukset/Keltainen 1ABC.TXT
 /Users/matrps/Riston-D/E/Hankkeet/LIGNUM/Erillishankkeet/Hienot-juuret/juuristoskannaukset/Keltainen 2ABCuusi.TXT
 /Users/matrps/Riston-D/E/Hankkeet/LIGNUM/Erillishankkeet/Hienot-juuret/juuristoskannaukset/Keltainen 3ABC.TXT
 /Users/matrps/Riston-D/E/Hankkeet/LIGNUM/Erillishankkeet/Hienot-juuret/juuristoskannaukset/Keltainen 4ABCu.TXT
@@ -7,6 +7,7 @@
 /Users/matrps/Riston-D/E/Hankkeet/LIGNUM/Erillishankkeet/Hienot-juuret/juuristoskannaukset/Keltainen 7ABCuusi.TXT
 /Users/matrps/Riston-D/E/Hankkeet/LIGNUM/Erillishankkeet/Hienot-juuret/juuristoskannaukset/Keltainen 8ABCuusi.TXT
 /Users/matrps/Riston-D/E/Hankkeet/LIGNUM/Erillishankkeet/Hienot-juuret/juuristoskannaukset/Keltainen 9ABCuusi.TXT
+/Users/matrps/Riston-D/E/Hankkeet/LIGNUM/Erillishankkeet/Hienot-juuret/juuristoskannaukset/Keltainen_1ABC.TXT
 /Users/matrps/Riston-D/E/Hankkeet/LIGNUM/Erillishankkeet/Hienot-juuret/juuristoskannaukset/Oranssi 1ABCu.TXT
 /Users/matrps/Riston-D/E/Hankkeet/LIGNUM/Erillishankkeet/Hienot-juuret/juuristoskannaukset/Oranssi 2ABC.TXT
 /Users/matrps/Riston-D/E/Hankkeet/LIGNUM/Erillishankkeet/Hienot-juuret/juuristoskannaukset/Oranssi 3ABCuusi.TXT
