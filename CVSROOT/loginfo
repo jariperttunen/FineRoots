@@ -45,7 +45,7 @@
 ^SugarMaple Mail -s %s jari.perttunen@metla.fi risto.sievanen@metla.fi sdelagrange@iqaff.qc.ca  
 ^YellowBirch Mail -s %s jari.perttunen@metla.fi risto.sievanen@metla.fi   
 ^Gliricidia Mail -s %s risto.sievanen@metla.fi jari.perttunen@metla.fi
-^decay Mail -s %s theikura@iki.fi jari.perttunen@metla.fi
+^decay Mail -s %s jari.perttunen@metla.fi risto.sievanen@metla.fi
 ^XCode mail -s %s jari.perttunen@metla.fi risto.sievanen@metla.fi
 ^DataTree Mail -s %s  risto.sievanen@metla.fi jari.perttunen@metla.fi
 ^Cowberry Mail -s %s  risto.sievanen@metla.fi jari.perttunen@metla.fi
@@ -74,4 +74,6 @@
 ^XylemPhloem Mail -s %s risto.sievanen@metla.fi jari.perttunen@metla.fi
 ^ghg Mail -s %s jari.perttunen@metla.fi aleksi.lehtonen@metla.fi
 ^ForestRadiation Mail -s %s risto.sievanen@metla.fi Kokkatil.Gopalkrishnan@metla.fi
+^FAPTM-Tree Mail -s %s risto.sievanen@metla.fi Kokkatil.Gopalkrishnan@metla.fi
+
 
