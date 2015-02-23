@@ -75,5 +75,7 @@
 ^ghg Mail -s %s jari.perttunen@metla.fi aleksi.lehtonen@metla.fi
 ^ForestRadiation Mail -s %s risto.sievanen@metla.fi
 ^FAPTM-Tree Mail -s %s risto.sievanen@metla.fi
+^SpruceDigital Mail -s %s risto.sievanen@luke.fi Pekka.J.Kaitaniemi@helsinki.fi jari.perttunen@luke.fi
+
 
 
