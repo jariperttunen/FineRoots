@@ -5,6 +5,7 @@
 
 using namespace std;
 
+bool is_left = false;
 class FineRootBud;
 
 class FineRootSegment : public CfTreeSegment<FineRootSegment,FineRootBud>
@@ -30,8 +31,8 @@ class SetLink {
  SetLink(const int f_num, const int m_num, const int m_o) : father_num(f_num), 
     my_num(m_num), my_order(m_o) {}
 
-  TreeCompartment<FineRootSegment,FineRootBud>* operator()
-    (TreeCompartment<FineRootSegment,FineRootBud>* tc)const {
+  bool& operator()
+    (bool& succ, TreeCompartment<FineRootSegment,FineRootBud>* tc)const {
     if(Axis<FineRootSegment,FineRootBud>* ax = 
        dynamic_cast<Axis<FineRootSegment,FineRootBud>*>(tc)){
       list<TreeCompartment<FineRootSegment,FineRootBud>*>& c_list =
@@ -46,9 +47,10 @@ class SetLink {
 	    break;             //father found
 	  }
       }
-      if(!found)
-	return tc;
-
+      if(!found) {
+	return succ;
+      }
+      succ = true;
       Tree<FineRootSegment,FineRootBud>& t = GetTree(*frs);
       
       if(static_cast<int>(GetValue(*frs,LGAomega) == my_order)) {
@@ -80,7 +82,7 @@ class SetLink {
       }
     }   
  
-    return tc;
+    return succ;
   }
  private:
   int father_num;
@@ -88,8 +90,9 @@ class SetLink {
   int my_order;
 };
 
-void add_link(Tree<FineRootSegment,FineRootBud>& fr_tree, const int num,
+bool add_link(Tree<FineRootSegment,FineRootBud>& fr_tree, const int num,
 	      const int father_num, const int ord)  {
+  bool succ = false;
   if(num == 0)  { //first segment, tree is empty
       Axis<FineRootSegment,FineRootBud>& main_ax = GetAxis(fr_tree);
       FineRootBud *bud0 = new  FineRootBud(&fr_tree);
@@ -102,13 +105,18 @@ void add_link(Tree<FineRootSegment,FineRootBud>& fr_tree, const int num,
       seg0->setNumber(num);
       SetValue(*seg0,LGAomega,static_cast<double>(ord));
       //      cout << "nolla " << num << endl;
+      succ = true;
   }
   else {
     SetLink sl(father_num, num, ord);
-    ForEach(fr_tree, sl);
+    bool succ0 = false;
+    succ = Accumulate(fr_tree, succ0,sl);
+/*     if(!succ) { */
+/*       cout << "not found " << father_num << endl; */
+/*     } */
   }
 
-  return;
+  return succ;
 }
 
 class PrintN {
@@ -125,29 +133,53 @@ class PrintN {
 struct SAInfo {
   Point point;
   PositionVector direction;
+  int order;
+  bool is_left;
 };
+
 
 class SetArchitecture {
  public:
- SetArchitecture(vector<vector<double> >& dat) : data(dat) {} 
+ SetArchitecture(vector<pair<int, vector<double> > >& dat) : data(dat) {} 
   SAInfo& operator()
     (SAInfo& from_base, TreeCompartment<FineRootSegment,FineRootBud>* tc)const {
     if(FineRootSegment* frs = dynamic_cast<FineRootSegment*>(tc)){
       int number = frs->getNumber();
-      double len = (data[number])[0];
-      double diam = (data[number])[1];
-      double angle = (data[number])[2];
-      extern int ran3_seed;
-      if(ran3(&ran3_seed) < 0.5)
-	angle = -angle;
+      int row = 0;
+      for(row = 0; row < (int)data.size(); row++) {
+	if((data[row]).first == number)
+	  break;
+      }
+      if(row == (int)data.size()) {
+	cout << "SetArchitecture - Segment number " << number << " not found!" << endl;
+	exit(0);
+      }
+      double len = (data[row]).second[0];
+      double diam = (data[row]).second[1];
+      double angle = (data[row]).second[2];
 
+/*       if(static_cast<int>(GetValue(*frs,LGAomega)) == from_base.order) { */
+/* 	if(from_base.is_left) { */
+/* 	  from_base.is_left = false; */
+/* 	} */
+/* 	else { */
+/* 	  angle = -angle; */
+/* 	  from_base.is_left = true; */
+/* 	} */
+/*       } */
+/*       else { */
+	extern int ran3_seed;
+	if(ran3(&ran3_seed) < 0.5)
+	  angle = -angle;
+/*       } */
       SetValue(*frs,LGAR, diam/2.0);
       SetValue(*frs,LGAL, len);
-
       SetPoint(*frs, from_base.point);
 
       if(number == 0) {   //base segment
 	SetDirection(*frs, from_base.direction);
+	from_base.is_left=false;
+	from_base.order = 0;
       }
       else {
 	Turtle t;
@@ -177,8 +209,89 @@ class SetArchitecture {
     return from_base;
   }
  private:
-  vector<vector<double> > data;
+  vector<pair<int, vector<double> > > data;
+};
 
+
+class CollectApexes {
+ public:
+  vector<pair<double,double> >& operator()
+    (vector<pair<double,double> >& apexes, TreeCompartment<FineRootSegment,FineRootBud>* tc)const {
+    if(Axis<FineRootSegment,FineRootBud>* axis = dynamic_cast<Axis<FineRootSegment,FineRootBud>*>(tc)){
+      TreeSegment<FineRootSegment,FineRootBud>* ls  = GetLastTreeSegment(*axis);
+      if(!(ls == NULL)) {
+	Point p = GetEndPoint(*ls);
+	pair<double,double>a(p.getX(),p.getZ());
+	apexes.push_back(a);
+      }
+    }
+    return apexes;
+  }
+};
+
+
+void collect_other_apexes(Axis<FineRootSegment,FineRootBud>& axis, vector<pair<double,double> >& apexes) {
+  TreeSegment<FineRootSegment,FineRootBud>* ls  = GetLastTreeSegment(axis);
+  if(!(ls == NULL)) {
+    Point p = GetEndPoint(*ls);
+    pair<double,double>a(p.getX(),p.getZ());
+    apexes.push_back(a);
+  }
+
+  list<TreeCompartment<FineRootSegment,FineRootBud>*>& tc_list = GetTreeCompartmentList(axis);
+  list<TreeCompartment<FineRootSegment,FineRootBud>*>::iterator I;
+  for(I = tc_list.begin(); I != tc_list.end(); I++) {
+    if(BranchingPoint<FineRootSegment,FineRootBud>* bp = dynamic_cast<BranchingPoint<FineRootSegment,FineRootBud>*>(*I)){
+      std::list<Axis<FineRootSegment,FineRootBud>*>& ax_lst = GetAxisList(*bp);
+      std::list<Axis<FineRootSegment,FineRootBud>*>::iterator aI;
+      for(aI = ax_lst.begin(); aI != ax_lst.end(); aI++) {
+	collect_other_apexes(**aI, apexes);
+      }
+    }
+  }
+
+}
+
+
+class CollectApexes2 {
+ public:
+  vector<vector<pair<double,double> > >& operator()
+    (vector<vector<pair<double,double> > >& apexes2, TreeCompartment<FineRootSegment,FineRootBud>* tc)const {
+    if(Axis<FineRootSegment,FineRootBud>* axis = dynamic_cast<Axis<FineRootSegment,FineRootBud>*>(tc)){
+      TreeSegment<FineRootSegment,FineRootBud>* ls  = GetLastTreeSegment(*axis);
+      if(!(ls == NULL)) {
+	if((int)GetValue(*ls, LGAomega) == 1) {
+	  vector<pair<double,double> > this_apexs;
+
+	  list<TreeCompartment<FineRootSegment,FineRootBud>*>& tc_list = GetTreeCompartmentList(*axis);
+	  if((int)tc_list.size() == 3) {      //Only one segment, area l * 0.57*l,
+	    //explained in /Users/matrps/Riston-D/E/Hankkeet/LIGNUM/Erillishankkeet/Metlan-hankkeet/
+	    // Hienot-juuret/Workbook.txt 
+	    double l  = GetValue(*ls, LGAL);
+	    pair<double,double> p1(0.0, 0.0);
+	    this_apexs.push_back(p1);
+	    pair<double,double> p2(l/2.0, 2.0*0.57*l);
+	    this_apexs.push_back(p2);
+	    pair<double,double> p3(l, 0.0);
+	    this_apexs.push_back(p3);
+	
+	    apexes2.push_back(this_apexs);
+	  } else {
+	    TreeSegment<FineRootSegment,FineRootBud>* seg  = GetFirstTreeSegment(*axis);
+	    Point p = GetPoint(*seg);
+	    pair<double,double>a0(p.getX(),p.getZ()); //also start of the side branch belongs to boundary
+	    this_apexs.push_back(a0);
+
+	    collect_other_apexes(*axis, this_apexs); 
+
+	    apexes2.push_back(this_apexs);
+	  }
+	}
+
+      }
+    }
+    return apexes2;
+  }
 };
 
  
