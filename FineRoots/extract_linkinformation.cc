@@ -120,6 +120,7 @@ int main(int argc, char** argv)
 
   //Sitten prosessoidaan tiedostot
 
+  bool ennen = false;
   ofstream sum_file("kaikki0.dat",ofstream::trunc); //Tama on valikaikainen
   //tulostustiedosto
 
@@ -184,6 +185,16 @@ int main(int argc, char** argv)
 	  sum_file << fields[i] << " ";
 	}
 	sum_file << endl;
+
+	if(atoi(fields[2].c_str()) <= atoi(fields[13].c_str())){
+	  ennen = true;
+	  cout << "!!!!";
+	  for(int i = 0; i < 19; i++) {
+	    cout << fields[i] << " ";
+	  }
+	  cout << endl;
+	}
+    
       }    // if(s2 == "LINK" && s1 != "SampleId") ...
 
     }
@@ -191,6 +202,8 @@ int main(int argc, char** argv)
   }
   sum_file.close();
 
+  if(ennen)
+    exit(0);
 
   //Part 2: read kaikki0.dat and add root volume
 
@@ -227,7 +240,7 @@ int main(int argc, char** argv)
     root_links.push_back(items);
   }
 
-  //tämä koska muuten viimeinen juuri jaa kasitteöematta, kun
+  //tämä koska muuten viimeinen juuri jaa kasittelematta, kun
   //on tultu for(;;) loopista pois break : lla
   output_previous_root(root_links, lopullinen);
 
