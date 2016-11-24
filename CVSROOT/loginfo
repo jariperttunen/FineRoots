@@ -72,7 +72,7 @@
 ^SIBYLASpruce Mail -s %s risto.sievanen@metla.fi maral2@azet.sk jari.perttunen@metla.fi
 ^Heterobasidion Mail -s %s risto.sievanen@metla.fi jari.perttunen@metla.fi
 ^XylemPhloem Mail -s %s risto.sievanen@metla.fi jari.perttunen@metla.fi
-^ghg Mail -s %s jari.perttunen@metla.fi aleksi.lehtonen@luke.fi paula.ollila@luke.fi markus.haakana@luke.fi
+^ghg Mail -s %s jari.perttunen@metla.fi paula.ollila@luke.fi markus.haakana@luke.fi
 ^ForestRadiation Mail -s %s risto.sievanen@metla.fi
 ^FAPTM-Tree Mail -s %s risto.sievanen@metla.fi
 ^SpruceDigital Mail -s %s risto.sievanen@luke.fi Pekka.J.Kaitaniemi@helsinki.fi jari.perttunen@luke.fi
