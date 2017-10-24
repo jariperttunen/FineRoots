@@ -12,6 +12,8 @@
 //The progran relies heavily to the property of the links that they are
 //numbered from 0 to #links-1 and if a link is acropetally from the subject link,
 //its number is larger.
+//This requirement has been (at least partly) relaxed: now links are added in many passes
+//(while loop) unitil all (those that can be added) links have been added.
 
 #include <cstdlib>
 #include <fstream>
@@ -26,6 +28,7 @@
 #include <XMLTree.h>
 #include <ParseCommandLine.h>
 #include <MakeFineRoots.h>
+#include <Functors.h>
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/ch_graham_andrew.h>
@@ -46,15 +49,43 @@ using namespace std;
 
 int ran3_seed = -9648383; //-23797843;
 
+//
+int ITEMS_ON_LINE = 21;
+
+//Line as is 18.10.2017, 21 items
+//SampleId Part LinkNo SeedlingNo Length ProjArea SurfArea AvgDiam Ind Angle
+//Magnitude Altitude Order Rvolume Father Brother1 Brother2 Baby1 Baby2 Baby3 paakussa
+
+//Kaikki analyysit nyt - 18.10.2017 - tehdään FindPioneerClass funktorissa.
+
+
 void process_line(string& line, vector<string>& items) {
   istringstream l(line);
-  for(int i = 0; i < 20; i++) {
+  for(int i = 0; i < ITEMS_ON_LINE; i++) {
     l >> items[i];
   }
+  items[ITEMS_ON_LINE] = "false";  //this is for bookeeping if item has
+                                   //already been added to root
 }
 
 int main(int argc, char* argv[])
 {
+  bool FIRST = true;
+
+
+  if(argc < 2) {  //Tämä on hack, että saa tulostetuksi usagen. Lukee joka tapauksessa kaikki.dat.
+    cout << "Usage: ./mfr kaikki.dat [-seed <value>] [-rootInfo] [-writeProgress]" << endl;
+    cout << "             [-areas] [-influenceArea] [-influenceArea2]" << endl;
+    cout << endl;
+    cout << "-seed <value>    Satunnaislukugeneraattorin ínitialisointi oikea-vasen suuntaa varten." << endl;
+    cout << "-rootInfo        Tulostaa konsolille SampleId 't tiedostosta kaikki.dat" << endl;
+    cout << "-writeProgress   Kirjoittaa konsolille Käsiteötävät SampleId't ja kuinka monta linkkia." << endl; 
+    cout << "-areas           Kirjoittaa sivujuurien (piempi kuin 1,5 cm) konsolille." << endl;
+    cout << "-influenceArea   Aikaisempien analyysien (2016) area laskuja - ehka ei toimi nykydatalla." << endl;
+    cout << "-influenceArea2  Aikaisempien analyysien (2016) area laskuja - ehka ei toimi nykydatalla." << endl;
+    exit(0);
+  }
+
 
   string clarg;
   if(ParseCommandLine(argc,argv,"-seed", clarg )) {
@@ -94,18 +125,25 @@ int main(int argc, char* argv[])
   //   }
 
 
-  vector<string> items(21);
+  //As per 18.10.2017: ITEMS_ON_LINE items on line,
+  //Item ITEMS_ON_LINE = whether this link has already been added
+  vector<string> items(ITEMS_ON_LINE + 1);
   list<vector<string> > root_links;
 
   getline(input_file,line);                 //header
 
   getline(input_file,line);       //first segment to start 
   process_line(line, items);
-  items[20] = "false";
   root_links.push_back(items);
 
   string current_label1 = items[0];
   string current_label2 = items[1];
+
+
+  //This loop (for(;;)   ) reads root link data from kaikki.dat
+  //that contains data from many roots
+  //If root is changed (items[0] or items[1] is changed) a root is
+  // constructed, then reading link data goes goes on
 
   bool last = false;
   for(;;) {
@@ -116,38 +154,54 @@ int main(int argc, char* argv[])
     process_line(line, items);
     
     if(items[1] != current_label2 || items[0] != current_label1 || last) { //make root
+
+      if(!CheckCommandLine(argc,argv,"-rootInfo")) {
+       
+
       if(kuvat.find(current_label1) != kuvat.end()) {
       
 	int n_links = static_cast<int>(root_links.size());
-	cout << current_label1 << " " << current_label2 <<  " links: " << n_links << endl;
+	  if(CheckCommandLine(argc,argv,"-writeProgress")) {
+
+	    cout << current_label1 << " " << current_label2 <<  " links: " << n_links << endl;
+
+	  }
       
 	Tree<FineRootSegment,FineRootBud> froot(Point(0,0,0), PositionVector(0,0,-1.0));
 
 	list<vector<string> >::iterator rI;
-	cout << "root_links " << " " <<root_links.size() << endl;
 
+	//This while loop iterates until all links that can be added to a root
+	//have been added. If row of child link is above row of parent link, it
+	//can be added to root only in a later pass.
 	int added_links = 1;
 	while(added_links > 0) {
 	  added_links = 0;
 	  for(rI = root_links.begin(); rI != root_links.end(); rI++) {
-	    if((*rI)[20] == "false") {
+	    if((*rI)[ITEMS_ON_LINE] == "false") {
 	      int link_num = atoi(((*rI)[2]).c_str());
+	      //cout << link_num << endl;
 	      int father_num = atoi(((*rI)[14]).c_str());
 	      int order = atoi(((*rI)[12]).c_str());
+	      double in_ch = atof(((*rI)[ITEMS_ON_LINE - 1]).c_str());
 
-	      bool succ = add_link(froot, link_num, father_num, order);
+	      bool succ = add_link(froot, link_num, father_num, order, in_ch);
 	      if(succ) {
-		(*rI)[20] = "true";
+		(*rI)[ITEMS_ON_LINE] = "true";
 		added_links++;
 	      }
 	    }
 	  }
-	  //	  cout << "added_links " << added_links << endl;
+	  if(CheckCommandLine(argc,argv,"-writeProgress")) {
+	    cout << "Root " << (*root_links.begin())[0] << " " << (*root_links.begin())[1]
+		 << "  added_links " << added_links << endl;
+	  }
 	}
 
+	
 	vector<pair<int, vector<double> > >struct_data;  //length, diam, angle by segment number
 	for(rI = root_links.begin(); rI != root_links.end(); rI++) {
-	  double len = atof(((*rI)[4]).c_str())/1000.0;
+	  double len = atof(((*rI)[4]).c_str())/100.0;
 	  double diam = atof(((*rI)[7]).c_str())/1000.0;
 	  double angle = atof(((*rI)[9]).c_str());
 	  int link_num = atoi(((*rI)[2]).c_str());
@@ -166,6 +220,48 @@ int main(int argc, char* argv[])
 	sai.point = Point(0.0,0.0,0.0);
 	sai.direction = PositionVector(0.0,0.0,-1.0); //Fine root goes downwards
 	PropagateUp(froot, sai, SA);
+
+
+	ForEach(froot, SetPForDebug());
+
+
+	pioneer_class_info alku;
+	alku = AccumulateDown(froot, alku,
+			      FindPioneerClass(0.015,0.005,current_label1));
+
+	if(!CheckCommandLine(argc,argv,"-areas")) {
+
+	  if(FIRST) {
+	    cout << "root class0  class1 class2 class3 class4 p0 p1 p2 p3 p4" << endl;
+	    FIRST = false;
+	  }
+	  cout << current_label1 << " ";
+	  for(int i = 0; i < 5; i++) {
+	    cout << alku.class_freq[i] << " ";
+	  }
+	  for(int i = 0; i < 5; i++) {
+	    cout << alku.in_chunk[i] << " ";
+	  }
+	  cout << endl;
+
+	} else {
+
+	  if(FIRST) {
+	    cout << "root area0  area1  area2  area3  area4" << endl;
+	    FIRST = false;
+	  }
+
+	  //	cout << "ro" << endl;
+	  cout << current_label1 << " ";
+
+	  for(int i = 0; i < 5; i++) {
+	    cout << alku.class_area[i] << " ";
+	  }
+	  cout << endl;
+	}
+
+	//	exit(0);
+
 
 	if(CheckCommandLine(argc,argv,"-influenceArea")) {
 	  
@@ -253,12 +349,14 @@ int main(int argc, char* argv[])
 	  are << current_label1 << " " << current_label2 << " " << area << endl;
 	  are.close();
 	}
-	else {
+	else  if(CheckCommandLine(argc,argv,"-writeXML")) {
 	  XMLDomTreeWriter<FineRootSegment,FineRootBud> writer;
-	  writer.writeTreeToXML(froot,current_label1+current_label2+".xml");
+	  writer.writeTreeToXML(froot,current_label1+"_"+current_label2+".xml");
 	}
 
       }   //if(kuvat.find(current_label1) != ...
+
+      }  //if(!CheckCommandLine(argc,argv,"-rootInfo") ...
 
       if(last)
 	break;
@@ -266,6 +364,11 @@ int main(int argc, char* argv[])
       root_links.clear();
       current_label2 = items[1];
       current_label1 = items[0];
+
+      if(CheckCommandLine(argc,argv,"-rootInfo")) {
+	cout <<  current_label1 << endl;
+      }
+
     }
     root_links.push_back(items);
   }

@@ -22,6 +22,6 @@ win32:CONFIG += console
 #CGAL requires -frounding-math on Linux, not necessary on Mac
 QMAKE_CXXFLAGS += -frounding-math 
 
-HEADERS += include/MakeFineRoots.h
+HEADERS += include/MakeFineRoots.h include/Functors.h
 
 SOURCES += make_fineroots.cc

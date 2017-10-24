@@ -3,6 +3,13 @@
 #include <Lignum.h>
 #include <Turtle.h>
 
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/ch_graham_andrew.h>
+#include <CGAL/Polygon_2.h>
+typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+typedef K::Point_2 Point_2;
+typedef CGAL::Polygon_2<K> Polygon_2;
+
 using namespace std;
 
 bool is_left = false;
@@ -12,13 +19,16 @@ class FineRootSegment : public CfTreeSegment<FineRootSegment,FineRootBud>
 {
  public:
   FineRootSegment(Tree<FineRootSegment,FineRootBud>* t) 
-    :CfTreeSegment<FineRootSegment,FineRootBud>(t){}
+    :CfTreeSegment<FineRootSegment,FineRootBud>(t), in_chunk(0.0) {}
 
   int getNumber() {return number;}
   void setNumber(const int& nu) {number = nu;}
+  int getInChunk() {return in_chunk;}
+  void setInChunk(const double& c) {in_chunk = c;}
 
  private:
-  int number;      
+  int number;
+  double in_chunk;
  };
 
 class FineRootBud:public Bud<FineRootSegment,FineRootBud>{
@@ -28,8 +38,8 @@ public:
 
 class SetLink {
  public:
- SetLink(const int f_num, const int m_num, const int m_o) : father_num(f_num), 
-    my_num(m_num), my_order(m_o) {}
+ SetLink(const int f_num, const int m_num, const int m_o, const double in_ch) : father_num(f_num), 
+    my_num(m_num), my_order(m_o), in_chunk(in_ch) {}
 
   bool& operator()
     (bool& succ, TreeCompartment<FineRootSegment,FineRootBud>* tc)const {
@@ -57,6 +67,7 @@ class SetLink {
 	FineRootSegment* seg = new FineRootSegment(&t);  //into the same axis
 	seg->setNumber(my_num);
 	SetValue(*seg,LGAomega,static_cast<double>(my_order));
+	seg->setInChunk(in_chunk);
 	BranchingPoint<FineRootSegment,FineRootBud> *bp =
 	  new BranchingPoint<FineRootSegment,FineRootBud>(&t);
 	Ic++;  Ic++;    //points now past next BranchingPoint
@@ -68,6 +79,7 @@ class SetLink {
 	FineRootSegment* new_seg = new FineRootSegment(&t);
 	new_seg->setNumber(my_num);
 	SetValue(*new_seg,LGAomega,static_cast<double>(my_order));
+	new_seg->setInChunk(in_chunk);
 	BranchingPoint<FineRootSegment,FineRootBud> *new_bp =
 	  new BranchingPoint<FineRootSegment,FineRootBud>(&t);
 	Axis<FineRootSegment,FineRootBud>* new_ax =
@@ -88,10 +100,11 @@ class SetLink {
   int father_num;
   int my_num;
   int my_order;
+  double in_chunk;
 };
 
 bool add_link(Tree<FineRootSegment,FineRootBud>& fr_tree, const int num,
-	      const int father_num, const int ord)  {
+	      const int father_num, const int ord, const double in_ch)  {
   bool succ = false;
   if(num == 0)  { //first segment, tree is empty
       Axis<FineRootSegment,FineRootBud>& main_ax = GetAxis(fr_tree);
@@ -105,10 +118,12 @@ bool add_link(Tree<FineRootSegment,FineRootBud>& fr_tree, const int num,
       seg0->setNumber(num);
       SetValue(*seg0,LGAomega,static_cast<double>(ord));
       //      cout << "nolla " << num << endl;
+      seg0->setInChunk(in_ch);
+
       succ = true;
   }
   else {
-    SetLink sl(father_num, num, ord);
+    SetLink sl(father_num, num, ord, in_ch);
     bool succ0 = false;
     succ = Accumulate(fr_tree, succ0,sl);
 /*     if(!succ) { */
@@ -252,6 +267,56 @@ void collect_other_apexes(Axis<FineRootSegment,FineRootBud>& axis, vector<pair<d
 
 }
 
+double calculate_area(Axis<FineRootSegment,FineRootBud>& axis) {
+
+  vector<pair<double, double> > apexes;
+
+  TreeSegment<FineRootSegment,FineRootBud>* fs  = GetFirstTreeSegment(axis);
+  TreeSegment<FineRootSegment,FineRootBud>* ls  = GetLastTreeSegment(axis);
+
+  apexes.push_back(pair<double,double>(GetPoint(*fs).getX(), GetPoint(*fs).getY()));
+  apexes.push_back(pair<double,double>(GetEndPoint(*ls).getX(), GetEndPoint(*ls).getY()));
+
+  collect_other_apexes(axis, apexes);
+
+  //  cout << current_label1+current_label2 << endl;
+  vector<Point_2> apexes2;
+  //	  vector<pair<double, double> >::iterator Ip;
+  //	  for(Ip = apexes.begin(), Ip != apexes.end(); Ip++) {
+  for(int i = 0; i < static_cast<int>(apexes.size()); i++) {
+    apexes2.push_back(Point_2(apexes[i].first,apexes[i].second));
+    //	    cout << apexes[i].first << " " << apexes[i].second << endl;
+  }
+
+  vector<Point_2> hull(apexes2.size());
+
+  vector<Point_2>::iterator hull_end = 
+    CGAL::ch_graham_andrew( apexes2.begin(), apexes2.end(), hull.begin());
+
+  // 	  ofstream pisteet("pisteet.dat", ofstream::trunc);
+  // 	  for(vector<Point_2>::iterator I = apexes2.begin(); I != apexes2.end(); I++) {
+  // 	    pisteet << *I << endl;
+  // 	  }
+  // 	  pisteet.close();
+
+  // 	  ofstream hu("hull.dat", ofstream::trunc);
+  // 	  for(vector<Point_2>::iterator I = hull.begin(); I != hull_end; I++) {
+  // 	    hu << *I << endl;
+  // 	  }
+  // 	  hu.close();
+
+  Polygon_2 hull_pgon;
+  for(vector<Point_2>::iterator I = hull.begin(); I != hull_end; I++) {
+    hull_pgon.push_back(*I);
+  }
+
+  double are =  hull_pgon.area();
+  //  ofstream are("areas.dat", ofstream::app);
+  //  are << current_label1 << " " << current_label2 << " " << hull_pgon.area() << endl;
+  //  are.close();
+
+  return are;
+}
 
 class CollectApexes2 {
  public:
@@ -293,6 +358,20 @@ class CollectApexes2 {
     return apexes2;
   }
 };
+
+
+
+class SetPForDebug {
+ public:
+  TreeCompartment<FineRootSegment,FineRootBud>* operator()
+    (TreeCompartment<FineRootSegment,FineRootBud>* tc)const {
+    if(FineRootSegment *ts = dynamic_cast<FineRootSegment*>(tc)){
+      SetValue(*ts, LGAP, static_cast<double>(ts->getNumber()));
+      }
+    return tc;
+  }
+};
+
 
  
 #endif
