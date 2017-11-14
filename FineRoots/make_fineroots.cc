@@ -76,6 +76,7 @@ int main(int argc, char* argv[])
   if(argc < 2) {  //Tämä on hack, että saa tulostetuksi usagen. Lukee joka tapauksessa kaikki.dat.
     cout << "Usage: ./mfr kaikki.dat [-seed <value>] [-rootInfo] [-writeProgress]" << endl;
     cout << "             [-areas] [-influenceArea] [-influenceArea2]" << endl;
+    cout << "             [-writeXML]" << endl;
     cout << endl;
     cout << "-seed <value>    Satunnaislukugeneraattorin ínitialisointi oikea-vasen suuntaa varten." << endl;
     cout << "-rootInfo        Tulostaa konsolille SampleId 't tiedostosta kaikki.dat" << endl;
@@ -83,6 +84,7 @@ int main(int argc, char* argv[])
     cout << "-areas           Kirjoittaa sivujuurien (piempi kuin 1,5 cm) konsolille." << endl;
     cout << "-influenceArea   Aikaisempien analyysien (2016) area laskuja - ehka ei toimi nykydatalla." << endl;
     cout << "-influenceArea2  Aikaisempien analyysien (2016) area laskuja - ehka ei toimi nykydatalla." << endl;
+    cout << "-writeXML        Kirjoittaa xml tiedoston juurista." << endl;
     exit(0);
   }
 
@@ -184,7 +186,6 @@ int main(int argc, char* argv[])
 	      int father_num = atoi(((*rI)[14]).c_str());
 	      int order = atoi(((*rI)[12]).c_str());
 	      double in_ch = atof(((*rI)[ITEMS_ON_LINE - 1]).c_str());
-
 	      bool succ = add_link(froot, link_num, father_num, order, in_ch);
 	      if(succ) {
 		(*rI)[ITEMS_ON_LINE] = "true";

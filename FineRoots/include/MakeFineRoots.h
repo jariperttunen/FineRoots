@@ -23,7 +23,7 @@ class FineRootSegment : public CfTreeSegment<FineRootSegment,FineRootBud>
 
   int getNumber() {return number;}
   void setNumber(const int& nu) {number = nu;}
-  int getInChunk() {return in_chunk;}
+  double getInChunk() { return in_chunk;}
   void setInChunk(const double& c) {in_chunk = c;}
 
  private:
@@ -92,7 +92,7 @@ class SetLink {
 	  dynamic_cast<BranchingPoint<FineRootSegment,FineRootBud>*>(*Ic);
 	InsertAxis(*bp, new_ax);
       }
-    }   
+    } 
  
     return succ;
   }
@@ -119,7 +119,6 @@ bool add_link(Tree<FineRootSegment,FineRootBud>& fr_tree, const int num,
       SetValue(*seg0,LGAomega,static_cast<double>(ord));
       //      cout << "nolla " << num << endl;
       seg0->setInChunk(in_ch);
-
       succ = true;
   }
   else {
@@ -173,20 +172,10 @@ class SetArchitecture {
       double diam = (data[row]).second[1];
       double angle = (data[row]).second[2];
 
-/*       if(static_cast<int>(GetValue(*frs,LGAomega)) == from_base.order) { */
-/* 	if(from_base.is_left) { */
-/* 	  from_base.is_left = false; */
-/* 	} */
-/* 	else { */
-/* 	  angle = -angle; */
-/* 	  from_base.is_left = true; */
-/* 	} */
-/*       } */
-/*       else { */
-	extern int ran3_seed;
-	if(ran3(&ran3_seed) < 0.5)
-	  angle = -angle;
-/*       } */
+      extern int ran3_seed;
+      if(ran3(&ran3_seed) < 0.5)
+	angle = -angle;
+
       SetValue(*frs,LGAR, diam/2.0);
       SetValue(*frs,LGAL, len);
       SetPoint(*frs, from_base.point);
