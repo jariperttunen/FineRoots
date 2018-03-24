@@ -76,6 +76,6 @@
 ^ForestRadiation Mail -s %s risto.sievanen@luke.fi
 ^FAPTM-Tree Mail -s %s risto.sievanen@luke.fi
 ^SpruceDigital Mail -s %s risto.sievanen@luke.fi Pekka.J.Kaitaniemi@helsinki.fi jari.perttunen@luke.fi
-
+^lukeghg Mail -s %s jari.perttunen@luke.fi
 
 
