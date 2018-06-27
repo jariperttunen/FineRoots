@@ -106,5 +106,5 @@ DigitalTreeAll                                &c++adt &stl-lignum &Firmament &st
 Y07	      -s RistoS		      Y07
 Horizon                                       Horizon
 PythonWrappers                                PythonWrappers
-BigForest               -d                    FBigForest
+BigForest               -a                    FBigForest
 ForestHorizon                                 &core-model &BigForest
