@@ -104,7 +104,6 @@ CowberryAll                                   &c++adt &stl-lignum &Firmament &st
 DigitalTree          -s JariP                 DigitalTree
 DigitalTreeAll                                &c++adt &stl-lignum &Firmament &stl-voxelspace &Graphics &DigitalTree
 Y07	      -s RistoS		      Y07
-BigForest                                     &core-model/BigForest
 Horizon                                       Horizon
 PythonWrappers                                PythonWrappers
-ForestHorizon                                 &core-model &BigForest
+ForestHorizon                                 &core-model &core-model/BigForest
