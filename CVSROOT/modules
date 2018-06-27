@@ -107,4 +107,4 @@ Y07	      -s RistoS		      Y07
 Horizon                                       Horizon
 PythonWrappers                                PythonWrappers
 BigForest                                     BigForest
-ForestHorizon                      -a         &core-model/BigForest
+ForestHorizon                      -a         &core-model
