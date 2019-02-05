@@ -154,8 +154,9 @@ int main(int argc, char* argv[])
       last = true;
     }
     process_line(line, items);
-    
+
     if(items[1] != current_label2 || items[0] != current_label1 || last) { //make root
+
 
       if(!CheckCommandLine(argc,argv,"-rootInfo")) {
        
@@ -176,13 +177,15 @@ int main(int argc, char* argv[])
 	//This while loop iterates until all links that can be added to a root
 	//have been added. If row of child link is above row of parent link, it
 	//can be added to root only in a later pass.
+
+	int count = 0;
 	int added_links = 1;
 	while(added_links > 0) {
 	  added_links = 0;
 	  for(rI = root_links.begin(); rI != root_links.end(); rI++) {
+
 	    if((*rI)[ITEMS_ON_LINE] == "false") {
 	      int link_num = atoi(((*rI)[2]).c_str());
-	      //cout << link_num << endl;
 	      int father_num = atoi(((*rI)[14]).c_str());
 	      int order = atoi(((*rI)[12]).c_str());
 	      double in_ch = atof(((*rI)[ITEMS_ON_LINE - 1]).c_str());
@@ -193,6 +196,8 @@ int main(int argc, char* argv[])
 	      }
 	    }
 	  }
+
+
 	  if(CheckCommandLine(argc,argv,"-writeProgress")) {
 	    cout << "Root " << (*root_links.begin())[0] << " " << (*root_links.begin())[1]
 		 << "  added_links " << added_links << endl;
@@ -202,7 +207,7 @@ int main(int argc, char* argv[])
 	
 	vector<pair<int, vector<double> > >struct_data;  //length, diam, angle by segment number
 	for(rI = root_links.begin(); rI != root_links.end(); rI++) {
-	  double len = atof(((*rI)[4]).c_str())/100.0;
+	  double len = atof(((*rI)[4]).c_str())/1000.0;
 	  double diam = atof(((*rI)[7]).c_str())/1000.0;
 	  double angle = atof(((*rI)[9]).c_str());
 	  int link_num = atoi(((*rI)[2]).c_str());
@@ -221,7 +226,6 @@ int main(int argc, char* argv[])
 	sai.point = Point(0.0,0.0,0.0);
 	sai.direction = PositionVector(0.0,0.0,-1.0); //Fine root goes downwards
 	PropagateUp(froot, sai, SA);
-
 
 	ForEach(froot, SetPForDebug());
 
@@ -252,7 +256,6 @@ int main(int argc, char* argv[])
 	    FIRST = false;
 	  }
 
-	  //	cout << "ro" << endl;
 	  cout << current_label1 << " ";
 
 	  for(int i = 0; i < 5; i++) {
@@ -261,41 +264,24 @@ int main(int argc, char* argv[])
 	  cout << endl;
 	}
 
-	//	exit(0);
-
 
 	if(CheckCommandLine(argc,argv,"-influenceArea")) {
 	  
 	  vector<pair<double, double> > apexes;
 
 	  apexes = Accumulate(froot, apexes,  CollectApexes());
-	  //	  cout << apexes.size() << endl;
 
 	  cout << current_label1+current_label2 << endl;
 	  vector<Point_2> apexes2;
-	  //	  vector<pair<double, double> >::iterator Ip;
-	  //	  for(Ip = apexes.begin(), Ip != apexes.end(); Ip++) {
+
 	  for(int i = 0; i < (int)apexes.size(); i++) {
 	    apexes2.push_back(Point_2(apexes[i].first,apexes[i].second));
-	    //	    cout << apexes[i].first << " " << apexes[i].second << endl;
 	  }
 
 	  vector<Point_2> hull(apexes2.size());
 
 	  vector<Point_2>::iterator hull_end = 
 	    CGAL::ch_graham_andrew( apexes2.begin(), apexes2.end(), hull.begin());
-
-	  // 	  ofstream pisteet("pisteet.dat", ofstream::trunc);
-	  // 	  for(vector<Point_2>::iterator I = apexes2.begin(); I != apexes2.end(); I++) {
-	  // 	    pisteet << *I << endl;
-	  // 	  }
-	  // 	  pisteet.close();
-
-	  // 	  ofstream hu("hull.dat", ofstream::trunc);
-	  // 	  for(vector<Point_2>::iterator I = hull.begin(); I != hull_end; I++) {
-	  // 	    hu << *I << endl;
-	  // 	  }
-	  // 	  hu.close();
 
 	  Polygon_2 hull_pgon;
 	  for(vector<Point_2>::iterator I = hull.begin(); I != hull_end; I++) {
@@ -318,11 +304,9 @@ int main(int argc, char* argv[])
 
 	  for(bI = branches.begin(); bI != branches.end(); bI++) {
 	    vector<Point_2> apexes2;
-	    //	  vector<pair<double, double> >::iterator Ip;
-	    //	  for(Ip = apexes.begin(), Ip != apexes.end(); Ip++) {
+
 	    for(int i = 0; i < (int)(*bI).size(); i++) {
 	      apexes2.push_back(Point_2(((*bI)[i]).first,((*bI)[i]).second));
-	      //	    cout << apexes[i].first << " " << apexes[i].second << endl;
 	    }
 
 	    vector<Point_2> hull(apexes2.size());
@@ -342,8 +326,6 @@ int main(int argc, char* argv[])
 	  if(!(ls == NULL)) {
 	    double l = GetValue(*ls, LGAL);
 	    area  += l*0.57*l;        //this is explained in 
-	    ///Users/matrps/Riston-D/E/Hankkeet/LIGNUM/Erillishankkeet/Metlan-hankkeet/
-	    //Hienot-juuret/Workbook.txt 
 	  }
 
 	  ofstream are("areas.dat", ofstream::app);
@@ -352,7 +334,7 @@ int main(int argc, char* argv[])
 	}
 	else  if(CheckCommandLine(argc,argv,"-writeXML")) {
 	  XMLDomTreeWriter<FineRootSegment,FineRootBud> writer;
-	  writer.writeTreeToXML(froot,current_label1+"_"+current_label2+".xml");
+	  writer.writeTreeToXML(froot,current_label1+".xml");
 	}
 
       }   //if(kuvat.find(current_label1) != ...

@@ -95,6 +95,7 @@ void  output_previous_root (list<vector<string> >& r_links, ofstream& f_stream) 
       f_stream << (*rI)[i] << " ";
     }
     f_stream << endl;
+
   }
 }
 
@@ -147,6 +148,7 @@ int main(int argc, char** argv)
     sum_file << title << endl;
 
     vector<string> fields(19);
+    //    int count = 0;
     while(!data_file.eof()){
       //   getline(inp_file,line,'\r');
       getline(data_file,line);
@@ -163,15 +165,17 @@ int main(int argc, char** argv)
 
 	//The identification label s1 is of form xxxA, xxxB, ...
 	//The labels A, B, ... are taken to own variable
-	fields[0] = s1.substr(0,s1.size()-1);
+	fields[0] = s1.substr(0,s1.size());
+	//	fields[0] = s1.substr(0,s1.size()-1);
 	fields[1] = s1.substr(s1.size()-1,1);
 	l >> fields[2];
 	l >> fields[3];
 	l >> fields[4];           //Skip fourth column of data_file
+
 	for(int i = 4; i < 19; i++) {
 	  l >> fields[i];
 	}
-     
+
 	for(int i = 0; i < 19; i++) {
 	  if(fields[i].size() == 0)
 	    fields[i] = "-1";
@@ -185,6 +189,7 @@ int main(int argc, char** argv)
 	  sum_file << fields[i] << " ";
 	}
 	sum_file << endl;
+
 
 	if(atoi(fields[2].c_str()) <= atoi(fields[13].c_str())){
 	  ennen = true;
@@ -202,14 +207,15 @@ int main(int argc, char** argv)
   }
   sum_file.close();
 
-  if(ennen)
-    exit(0);
+//   if(ennen) {
+//       exit(0);
+//   }
 
   //Part 2: read kaikki0.dat and add root volume
 
   ofstream  lopullinen("kaikki.dat", ofstream::trunc);
-  lopullinen << "SampleId Part LinkNo SeedlingNo Length ProjArea SurfArea AvgDiam Ind Angle" <<
-    " Magnitude Altitude Order RVolume Father Brother1 Brother2 Baby1 Baby2 Baby3" << endl;
+  lopullinen << "SampleId Part LinkNo SeedlingNo Length ProjArea SurfArea AvgDiam Ind Angle"
+	     << " Magnitude Altitude Order RVolume Father Brother1 Brother2 Baby1 Baby2 Baby3" << endl;
 
   list<vector<string> > root_links;
   ifstream  uudestaan("kaikki0.dat");

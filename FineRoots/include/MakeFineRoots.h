@@ -125,9 +125,6 @@ bool add_link(Tree<FineRootSegment,FineRootBud>& fr_tree, const int num,
     SetLink sl(father_num, num, ord, in_ch);
     bool succ0 = false;
     succ = Accumulate(fr_tree, succ0,sl);
-/*     if(!succ) { */
-/*       cout << "not found " << father_num << endl; */
-/*     } */
   }
 
   return succ;
