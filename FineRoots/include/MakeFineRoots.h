@@ -168,6 +168,7 @@ class SetArchitecture {
       double len = (data[row]).second[0];
       double diam = (data[row]).second[1];
       double angle = (data[row]).second[2];
+      double disease = (data[row]).second[3];
 
       extern int ran3_seed;
       if(ran3(&ran3_seed) < 0.5)
@@ -175,6 +176,8 @@ class SetArchitecture {
 
       SetValue(*frs,LGAR, diam/2.0);
       SetValue(*frs,LGAL, len);
+      SetValue(*frs, LGAtype, disease);
+
       SetPoint(*frs, from_base.point);
 
       if(number == 0) {   //base segment

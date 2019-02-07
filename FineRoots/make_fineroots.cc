@@ -211,9 +211,11 @@ int main(int argc, char* argv[])
 	  double diam = atof(((*rI)[7]).c_str())/1000.0;
 	  double angle = atof(((*rI)[9]).c_str());
 	  int link_num = atoi(((*rI)[2]).c_str());
+	  double disease = atof(((*rI)[20]).c_str());
 
-	  vector<double> v(3);
+	  vector<double> v(4);
 	  v[0] = len; v[1] = diam; v[2] = angle;
+	  v[3] = disease;
 	  
 	  pair<int, vector<double> > item(link_num, v);
 	  struct_data.push_back(item);

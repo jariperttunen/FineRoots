@@ -94,8 +94,17 @@ void  output_previous_root (list<vector<string> >& r_links, ofstream& f_stream) 
     for(int i = 13; i < 19; i++) {
       f_stream << (*rI)[i] << " ";
     }
+    //Disease to kaikki.dat = Disease / (Healthy + Disease)
+    //Healthy in r_links is no. 19, Disease is no. 20
+    double all =  atof(((*rI)[19]).c_str())+atof(((*rI)[20]).c_str());
+    double dis = 0.0;
+    if(all > 0.0) {
+      dis = atof(((*rI)[20]).c_str())/ all;
+    }
+    oss.str("");
+    oss << setprecision(4) << dis;
+    f_stream << oss.str();
     f_stream << endl;
-
   }
 }
 
@@ -147,8 +156,9 @@ int main(int argc, char** argv)
 
     sum_file << title << endl;
 
-    vector<string> fields(19);
-    //    int count = 0;
+    vector<string> fields(21);
+    string dummy_string;
+
     while(!data_file.eof()){
       //   getline(inp_file,line,'\r');
       getline(data_file,line);
@@ -176,16 +186,24 @@ int main(int argc, char** argv)
 	  l >> fields[i];
 	}
 
-	for(int i = 0; i < 19; i++) {
+	l >> dummy_string;
+	l >> dummy_string;
+	l >> dummy_string;
+
+	l >> fields[19];           //Healthy
+	l >> dummy_string;
+	l >> fields[20];           //Disease
+
+	for(int i = 0; i < 21; i++) {
 	  if(fields[i].size() == 0)
 	    fields[i] = "-1";
 	}
 
-	for(int i = 0; i < 19; i++) {
+	for(int i = 0; i < 21; i++) {
 	  replace_umlaut(fields[i]);
 	}
 
-	for(int i = 0; i < 19; i++) {
+	for(int i = 0; i < 21; i++) {
 	  sum_file << fields[i] << " ";
 	}
 	sum_file << endl;
@@ -215,13 +233,14 @@ int main(int argc, char** argv)
 
   ofstream  lopullinen("kaikki.dat", ofstream::trunc);
   lopullinen << "SampleId Part LinkNo SeedlingNo Length ProjArea SurfArea AvgDiam Ind Angle"
-	     << " Magnitude Altitude Order RVolume Father Brother1 Brother2 Baby1 Baby2 Baby3" << endl;
+	     << " Magnitude Altitude Order RVolume Father Brother1 Brother2 Baby1 Baby2 Baby3"
+	     << "  Disease"<< endl;
 
   list<vector<string> > root_links;
   ifstream  uudestaan("kaikki0.dat");
 
   string current_label2 = "", current_label1 = "";
-  vector<string> items(19);
+  vector<string> items(21);
   for(;;) {
     getline(uudestaan,line);
     if(uudestaan.eof())
@@ -231,7 +250,7 @@ int main(int argc, char** argv)
     }
 
     istringstream l(line);
-    for(int i = 0; i < 19; i++) {
+    for(int i = 0; i < 21; i++) {
       l >> items[i];
     }
 
