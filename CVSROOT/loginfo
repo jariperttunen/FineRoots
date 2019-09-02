@@ -79,5 +79,5 @@
 ^lukeghg Mail -s %s jari.perttunen@luke.fi
 ^FineRoots Mail  -s %s  risto.sievanen@luke.fi jari.perttunen@luke.fi
 ^MottiSoil Mail  -s %s  risto.sievanen@luke.fi hannu.salminen@luke.fi
-
+^MELASoil Mail  -s %s  risto.sievanen@luke.fi kyle.eyvindson@luke.fi
 
