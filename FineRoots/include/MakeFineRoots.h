@@ -177,6 +177,7 @@ class SetArchitecture {
       SetValue(*frs,LGAR, diam/2.0);
       SetValue(*frs,LGAL, len);
       SetValue(*frs, LGAtype, disease);
+      cout << disease << endl;
 
       SetPoint(*frs, from_base.point);
 

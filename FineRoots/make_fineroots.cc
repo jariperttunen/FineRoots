@@ -155,7 +155,8 @@ int main(int argc, char* argv[])
     }
     process_line(line, items);
 
-    if(items[1] != current_label2 || items[0] != current_label1 || last) { //make root
+
+     if(items[1] != current_label2 || items[0] != current_label1 || last) { //make root
 
 
       if(!CheckCommandLine(argc,argv,"-rootInfo")) {
@@ -178,7 +179,6 @@ int main(int argc, char* argv[])
 	//have been added. If row of child link is above row of parent link, it
 	//can be added to root only in a later pass.
 
-	int count = 0;
 	int added_links = 1;
 	while(added_links > 0) {
 	  added_links = 0;
@@ -216,6 +216,7 @@ int main(int argc, char* argv[])
 	  vector<double> v(4);
 	  v[0] = len; v[1] = diam; v[2] = angle;
 	  v[3] = disease;
+	  cout << "v3 " << v[3] << endl;
 	  
 	  pair<int, vector<double> > item(link_num, v);
 	  struct_data.push_back(item);
