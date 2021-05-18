@@ -1,6 +1,9 @@
 ## FineRoots
-First, make sure you have both lignum-core and FineRoots
-at the same directory side by side. 
+
+Produce Lignum xml files from WinRhizo data.
+
+First, make sure you have both *lignum-core* and *FineRoots*
+at the same directory level side by side. 
 
 To compile extract_linkinformation.cc just type
 
@@ -11,8 +14,7 @@ To compile `mfr` (i.e. make fine roots) type
 +  qmake -r MakeFineRoots.pro
 +  make
 
-To compile `mfr` with optimization on 
-(faster, no debug) type
+To compile `mfr` with optimization on (faster, no debug) type:
 
   qmake -r "CONFIG+=release" MakeFineRoots.pro
   make
