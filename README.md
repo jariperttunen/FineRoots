@@ -23,13 +23,13 @@ To remove all compilation work type
 
 ## Using FineRoots
 
-First, run `extract`. It will read the file *files.txt* and
-produce link information to standard output and to file *kaikki.dat*.
+First, run `extract` without any command line options. It will read the file *files.txt* and
+produce root link information (connections) to standard output and to file *kaikki.dat*.
 
-Run `mfr`, to produce Lignum XML files:
+Then run `mfr` to produce Lignum XML files from *kaikki.dat*:
 + mfr kaikki.dat -writeXML
 
-Type `mfr` only to see usage information. 
+Type `mfr` on command line to see usage information. 
 
 
 
