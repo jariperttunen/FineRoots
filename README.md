@@ -1,6 +1,6 @@
 ## FineRoots
 First, make sure you have both lignum-core and FineRoots
-at same directory side by side. 
+at the same directory side by side. 
 
 To compile extract_linkinformation.cc just type
 
