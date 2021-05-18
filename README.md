@@ -26,7 +26,8 @@ To remove all compilation work type
 ## Using FineRoots
 
 First, run `extract` without any command line options. It will read the file *files.txt* and
-produce root link information (connections) to standard output and to file *kaikki.dat*.
+produce root link information (connections) to standard output and to file *kaikki.dat*. The file
+*files.txt* contains WinRhizo file names to be processed.
 
 Then run `mfr` to produce Lignum XML files from *kaikki.dat*:
 + mfr kaikki.dat -writeXML
