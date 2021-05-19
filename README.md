@@ -16,12 +16,12 @@ To compile `mfr` (i.e. make fine roots) type
 
 To compile `mfr` with optimization on (faster, no debug) type:
 
-  qmake -r "CONFIG+=release" MakeFineRoots.pro
-  make
++ qmake -r "CONFIG+=release" MakeFineRoots.pro
++ make
 
 To remove all compilation work type
 
-  make distclean
+ + make distclean
 
 ## Using FineRoots
 
@@ -32,7 +32,7 @@ produce root link information (connections) to standard output and to file *kaik
 Then run `mfr` to produce Lignum XML files from *kaikki.dat*:
 + mfr kaikki.dat -writeXML
 
-Type `mfr` on command line to see usage information. 
+Type `mfr` without command line arguments to see usage information. 
 
 
 
