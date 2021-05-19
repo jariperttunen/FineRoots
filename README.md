@@ -1,6 +1,6 @@
 ## FineRoots
 
-Produce Lignum xml files from WinRhizo data.
+Produce Lignum XML files from WinRhizo data.
 
 First, make sure you have both *lignum-core* and *FineRoots*
 at the same directory level side by side. 
